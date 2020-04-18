@@ -1,7 +1,7 @@
 # Poker
 Evaluates Poker Hands with the Treys Evaluator: [Github](https://github.com/ihendley/treys).
 
-## Instal
+## Install
 ```
 python3 -m venv virtualenv
 
