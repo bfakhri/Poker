@@ -22,9 +22,15 @@ class ScreenScraper:
         self.listener = mouse.Listener(on_click=self.on_click, on_move=self.on_move)
         self.listener.start()
 
+        # Switches
+        self.move_hand = True
+        self.move_board = False 
+
         # Min Window Params
         self.min_width = 20
         self.min_height = 20
+        self.max_width = 2000
+        self.max_height = 2000
 
         # Format is [x,y,w,h]
         self.hand_window = [0,0,self.min_width,self.min_height]
@@ -38,7 +44,7 @@ class ScreenScraper:
     def draw_windows(self):
         with mss.mss() as sct:
             # The screen part to capture
-            monitor = {"top": self.hand_window[0], "left": self.hand_window[1], "width": self.hand_window[2], "height": self.hand_window[3]}
+            monitor = {"top": self.hand_window[1], "left": self.hand_window[0], "width": self.hand_window[2], "height": self.hand_window[3]}
             print(self.hand_window)
             # Grab the data
             sct_img = np.asarray(sct.grab(monitor))
@@ -48,6 +54,9 @@ class ScreenScraper:
     def on_move(self, x, y):
         print('Pointer moved to {0}'.format(
             (x, y)))
+        if(self.move_hand):
+            self.hand_window[0:2] = [x,y]
+
 
     def on_click(self, x, y, button, pressed):
         print('{0} at {1}'.format(
@@ -64,13 +73,13 @@ class ScreenScraper:
         except AttributeError:
             print('special key {0} pressed'.format(key))
             if(key == keyboard.Key.up):
-                self.hand_window[3] += 1
+                self.hand_window[3] = np.clip(self.hand_window[3]+1, self.min_height, self.max_height)
             if(key == keyboard.Key.down):
-                self.hand_window[3] -= 1
+                self.hand_window[3] = np.clip(self.hand_window[3]-1, self.min_height, self.max_height)
             if(key == keyboard.Key.left):
-                self.hand_window[2] -= 1
+                self.hand_window[2] = np.clip(self.hand_window[2]-1, self.min_height, self.max_height)
             if(key == keyboard.Key.right):
-                self.hand_window[2] += 1
+                self.hand_window[2] = np.clip(self.hand_window[2]+1, self.min_height, self.max_height)
 
         self.draw_windows()
 
