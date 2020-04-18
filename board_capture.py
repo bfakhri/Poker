@@ -36,8 +36,8 @@ class ScreenScraper:
         self.first_windows = True
 
         # Format is [x,y,w,h]
-        self.hand_window = [0,0,self.min_width,self.min_height]
-        self.board_window = [0,0,self.min_width,self.min_height]
+        self.hand_window = [0,0,100,80]
+        self.board_window = [0,0,268,80]
 
         # Start watcher thread
         watch = threading.Thread(target=self.window_watcher)
@@ -52,16 +52,18 @@ class ScreenScraper:
         self.move_hand = True
         self.move_board = False 
         # Gets the position of the user's cards
-        print('Move mouse to top left-hand corner of hand then click')
+        print('Move mouse to top left-hand corner of hand')
         print('Use the arrow keys to adjust window')
+        print('PRESS ENTER WHEN DONE')
         while(self.move_hand):
             print('Waiting on hand...')
             time.sleep(1)
         # Gets the position of the board
         self.move_hand = False
         self.move_board = True 
-        print('Move mouse to top left-hand corner of board then click')
+        print('Move mouse to top left-hand corner of board')
         print('Use the arrow keys to adjust window')
+        print('PRESS ENTER WHEN DONE')
         while(self.move_board):
             print('Waiting on board...')
             time.sleep(1)
@@ -69,7 +71,6 @@ class ScreenScraper:
 
     def window_watcher(self):
         while(True):
-            print('Drawing windows...')
             self.draw_windows()
             time.sleep(0.01)
 
@@ -97,42 +98,39 @@ class ScreenScraper:
 
 
     def on_click(self, x, y, button, pressed):
-        print('{0} at {1}'.format(
-        'Pressed' if pressed else 'Released',
-        (x, y)))
-        if not pressed:
-            print('Done moving:')
-            self.move_hand = False
-            self.move_board = False
-            # Stop the listener
-            #return False
+        pass
+        #print('{0} at {1}'.format('Pressed' if pressed else 'Released',(x, y)))
+        #if not pressed:
+        #    print('Done moving:')
+        #    self.move_hand = False
+        #    self.move_board = False
+        #    # Stop the listener
+        #    #return False
 
     def key_on_press(self, key):
+        delta = 4
         if(key == keyboard.Key.enter):
             print('Done moving:')
             self.move_hand = False
             self.move_board = False
         if(self.move_hand):
             if(key == keyboard.Key.up):
-                self.hand_window[3] = np.clip(self.hand_window[3]+1, self.min_height, self.max_height)
+                self.hand_window[3] = np.clip(self.hand_window[3]+delta, self.min_height, self.max_height)
             if(key == keyboard.Key.down):
-                self.hand_window[3] = np.clip(self.hand_window[3]-1, self.min_height, self.max_height)
+                self.hand_window[3] = np.clip(self.hand_window[3]-delta, self.min_height, self.max_height)
             if(key == keyboard.Key.left):
-                self.hand_window[2] = np.clip(self.hand_window[2]-1, self.min_height, self.max_height)
+                self.hand_window[2] = np.clip(self.hand_window[2]-delta, self.min_height, self.max_height)
             if(key == keyboard.Key.right):
-                self.hand_window[2] = np.clip(self.hand_window[2]+1, self.min_height, self.max_height)
+                self.hand_window[2] = np.clip(self.hand_window[2]+delta, self.min_height, self.max_height)
         if(self.move_board):
             if(key == keyboard.Key.up):
-                self.board_window[3] = np.clip(self.board_window[3]+1, self.min_height, self.max_height)
+                self.board_window[3] = np.clip(self.board_window[3]+delta, self.min_height, self.max_height)
             if(key == keyboard.Key.down):
-                self.board_window[3] = np.clip(self.board_window[3]-1, self.min_height, self.max_height)
+                self.board_window[3] = np.clip(self.board_window[3]-delta, self.min_height, self.max_height)
             if(key == keyboard.Key.left):
-                self.board_window[2] = np.clip(self.board_window[2]-1, self.min_height, self.max_height)
+                self.board_window[2] = np.clip(self.board_window[2]-delta, self.min_height, self.max_height)
             if(key == keyboard.Key.right):
-                self.board_window[2] = np.clip(self.board_window[2]+1, self.min_height, self.max_height)
-
-        #self.draw_windows()
-        print(self.board_window)
+                self.board_window[2] = np.clip(self.board_window[2]+delta, self.min_height, self.max_height)
 
 
 
