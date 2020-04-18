@@ -13,22 +13,6 @@ import pynput
 from pynput import mouse
 from pynput import keyboard
 
-with mss.mss() as sct:
-    # The screen part to capture
-    monitor = {"top": 160, "left": 160, "width": 160, "height": 135}
-    output = "sct-{top}x{left}_{width}x{height}.png".format(**monitor)
-
-    # Grab the data
-    sct_img = sct.grab(monitor)
-
-    # Save to the picture file
-    mss.tools.to_png(sct_img.rgb, sct_img.size, output=output)
-    print(output)
-
-
-
-
-
 
 class ScreenScraper:
     def __init__(self):
@@ -38,9 +22,13 @@ class ScreenScraper:
         self.listener = mouse.Listener(on_click=self.on_click, on_move=self.on_move)
         self.listener.start()
 
+        # Min Window Params
+        self.min_width = 20
+        self.min_height = 20
+
         # Format is [x,y,w,h]
-        self.hand_window = [0,0,0,0]
-        self.board_window = [0,0,0,0]
+        self.hand_window = [0,0,self.min_width,self.min_height]
+        self.board_window = [0,0,self.min_width,self.min_height]
         # Gets the position of the user's cards
         print('Move mouse to top left-hand corner of hand')
         # Gets the position of the board
@@ -50,7 +38,7 @@ class ScreenScraper:
     def draw_windows(self):
         with mss.mss() as sct:
             # The screen part to capture
-            monitor = {"top": self.hand_window[0], "left": self.hand_window[1], "width": 160, "height": 135}
+            monitor = {"top": self.hand_window[0], "left": self.hand_window[1], "width": self.hand_window[2], "height": self.hand_window[3]}
             print(self.hand_window)
             # Grab the data
             sct_img = np.asarray(sct.grab(monitor))
@@ -75,14 +63,13 @@ class ScreenScraper:
             print('alphanumeric key {0} pressed'.format(key.char))
         except AttributeError:
             print('special key {0} pressed'.format(key))
-            print(key)
-            if(key == 'Key.up'):
+            if(key == keyboard.Key.up):
                 self.hand_window[3] += 1
-            if(key == 'Key.down'):
+            if(key == keyboard.Key.down):
                 self.hand_window[3] -= 1
-            if(key == 'Key.left'):
+            if(key == keyboard.Key.left):
                 self.hand_window[2] -= 1
-            if(key == 'Key.right'):
+            if(key == keyboard.Key.right):
                 self.hand_window[2] += 1
 
         self.draw_windows()
