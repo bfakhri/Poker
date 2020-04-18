@@ -1,3 +1,5 @@
+# Takes a hand and board combination and evaluates it #
+
 from treys import Card
 from treys import Deck
 from treys import Evaluator
