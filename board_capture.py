@@ -10,6 +10,7 @@ import mss
 import mss.tools
 import pynput
 import time
+import threading
 
 from pynput import mouse
 from pynput import keyboard
@@ -38,8 +39,13 @@ class ScreenScraper:
         self.hand_window = [0,0,self.min_width,self.min_height]
         self.board_window = [0,0,self.min_width,self.min_height]
 
+        # Start watcher thread
+        watch = threading.Thread(target=self.window_watcher)
+        watch.start()
+
         # Fix windows
         self.init_windows()
+
 
     def init_windows(self):
         # Set switches
@@ -61,6 +67,12 @@ class ScreenScraper:
             time.sleep(1)
         self.move_board = False 
 
+    def window_watcher(self):
+        while(True):
+            print('Drawing windows...')
+            self.draw_windows()
+            time.sleep(0.01)
+
     def draw_windows(self):
         with mss.mss() as sct:
             # The screen part to capture
@@ -75,7 +87,7 @@ class ScreenScraper:
                 cv2.moveWindow('hand', 600, 100)
                 cv2.moveWindow('board', 600, 400)
                 self.first_windows = False
-            cv2.waitKey(-1)
+            cv2.waitKey(1)
 
     def on_move(self, x, y):
         if(self.move_hand):
@@ -119,7 +131,7 @@ class ScreenScraper:
             if(key == keyboard.Key.right):
                 self.board_window[2] = np.clip(self.board_window[2]+1, self.min_height, self.max_height)
 
-        self.draw_windows()
+        #self.draw_windows()
         print(self.board_window)
 
 
