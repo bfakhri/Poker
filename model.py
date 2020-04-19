@@ -14,15 +14,16 @@ class CardClassifier(tf.keras.Model):
         # Params
         num_filters = 52
         num_conv_lyrs = 16
+        num_class_lyrs = 2 
 
         # Multi-scale feature extractor layers
         self.fe_lyrs = []
-        for i in range(num_conv_layers):
+        for i in range(num_conv_lyrs):
             self.fe_lyrs.append(tf.keras.layers.Conv2D(filters=num_filters, kernel_size=(3,3), strides=(1,1), padding='same', activation='relu'))
 
         # Classification layers
         self.class_lyrs = []
-        for i in range(num_conv_layers):
+        for i in range(num_class_lyrs):
             self.class_lyrs.append(tf.keras.layers.Dense(units=num_filters, activation='relu'))
 
     def call(self, x, reconstruct=True):
@@ -37,8 +38,12 @@ class CardClassifier(tf.keras.Model):
             print(idx, h.shape)
 
         # Reduce on spatial dimensions (bs, w, h, c) -> (bs, c)
-        (bs, w, h, c) = h.shape
-        h = tf.nn.max_pool(h, [w, h])
+        (bs, width, height, c) = h.shape
+        #h = tf.nn.max_pool(h, [1,w, h,1], [1,1,1,1], padding='SAME')
+        print(h.shape)
+        h = tf.math.reduce_max(h, axis=1)
+        h = tf.math.reduce_max(h, axis=1)
+        print(h.shape)
         for idx,layer in enumerate(self.class_lyrs):
             h = layer(h)
             print(idx, h.shape)
@@ -48,23 +53,3 @@ class CardClassifier(tf.keras.Model):
         return preds
 
         
-
-
-        
-class SOD_Model:
-    ''' 
-    Object detector
-    '''
-    def __init__(self):
-        super(SOD_Model, self).__init__()
-
-        # Model Params
-        num_filters = 8
-        output_size = 10
-
-        # Simple object detection layers
-        self.od_lyrs = []
-        self.od_lyrs.append(tf.keras.layers.Conv2D(filters=num_filters, kernel_size=(3,3), padding='same', activation='relu'))
-        self.od_lyrs.append(tf.keras.layers.Conv2D(filters=num_filters, kernel_size=(3,3), padding='same', activation='relu'))
-        self.od_lyrs.append(tf.keras.layers.Conv2D(filters=num_filters, kernel_size=(3,3), padding='same', activation='relu'))
-

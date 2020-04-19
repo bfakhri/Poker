@@ -68,12 +68,16 @@ class CardDataset:
                 cv2.imshow('Card', card)
                 cv2.waitKey(1)
 
-    def make_collection(self, min_cards=0, max_cards=5):
+    def make_collection(self, background=None, min_cards=0, max_cards=5):
         ''' Makes a collection of cards and the labels '''
         # Spacing between cards
         x_spacing = np.random.randint(1,20) 
         # Get base image
-        img_bg = self.img_backgrounds[np.random.randint(0,len(self.img_backgrounds))].copy()
+        if(background is None):
+            img_bg = self.img_backgrounds[np.random.randint(0,len(self.img_backgrounds))].copy()
+        else:
+            img_bg = background.copy()
+
         # Place cards on base image
         num_cards = np.random.randint(min_cards, max_cards) 
         x = x_spacing
@@ -98,6 +102,23 @@ class CardDataset:
             cv2.imshow('Collection', collection)
             cv2.waitKey(-1)
             
+
+    def batch_collection(self, bs):
+        ''' Generates a batch of card collections and labels '''
+        collections = []
+        labels = []
+        bg = self.img_backgrounds[np.random.randint(0,len(self.img_backgrounds))].copy()
+        for i in range(bs):
+            coll, lab = self.make_collection(background=bg)
+            collections.append(coll)
+            labels.append(lab)
+
+        batch_collections = np.stack(collections, axis=0)
+        batch_labels = np.stack(labels, axis=0)
+
+        return batch_collections, batch_labels
+
+
         
 
 if(__name__ == '__main__'):
