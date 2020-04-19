@@ -17,16 +17,18 @@ class CardDataset:
         # Params
         x_offs = 3 
         y_offs = 3 
+        font = self.fonts[0]
+        font_scale = 1
+
         # Get the base images
         img_card = self.img_blank_card.copy()
         img_suit = self.imgs_suit[suit].copy()
         # Place suit on blank card
         img_card[y_offs:y_offs+img_suit.shape[0], x_offs:x_offs+img_suit.shape[1], :] = img_suit
-        #img_card[img_card.shape[0]-img_suit.shape[0]:img_card.shape[0], img_card.shape[1]-img_suit.shape[1]:img_card.shape[0], :] = img_suit
-        print(img_card.shape[0]-img_suit.shape[0]-y_offs,img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1],img_card.shape[0])
-        print(img_card.shape[0]-img_suit.shape[0]-y_offs,img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1]-x_offs,img_card.shape[0]-x_offs)
-        print(img_card.shape)
         img_card[img_card.shape[0]-img_suit.shape[0]-y_offs:img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1]-x_offs:img_card.shape[1]-x_offs, :] = img_suit
+        ## Place rank on card
+        #rank_coords = (img_card[0]/2, img_card[1]/2)
+        #cv2.putText(img_card, rank, rank_coords, font, font_scale)
 
 
         # Place rank on blank card
@@ -41,7 +43,7 @@ class CardDataset:
                 card = self.make_card(suit, rank)
                 cards.append(card)
                 cv2.imshow('Card', card)
-                cv2.waitKey(-1)
+                cv2.waitKey(10)
 
     #kdef show_cards(cards):
     #k    for idx,card in enumerate(cards):
