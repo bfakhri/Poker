@@ -5,8 +5,10 @@ import model
 import datetime
 
 # Params
-batch_size = 2
-training_steps = 100
+batch_size = 6
+training_steps = 10000000
+save_steps = 1000
+models_dir = './saved_models/'
 
 # Get the dataset
 ds = Dataset.CardDataset()
@@ -28,6 +30,9 @@ for step in range(training_steps):
     x = tf.cast(x, tf.float32)/255.0
     y = tf.cast(y, tf.float32)
 
+    if(step == 0):
+        model._set_inputs(x)
+
     with tf.GradientTape() as tape:
         y_hat = model(x)
         loss = tf.reduce_mean(tf.keras.losses.categorical_crossentropy(y, y_hat))
@@ -40,6 +45,11 @@ for step in range(training_steps):
         tf.summary.histogram('Labels', y, step=step)
         tf.summary.histogram('Predictions', y_hat, step=step)
 
-        print(step, loss)
+        print(step, loss.numpy())
+
+    # Save model
+    if(step % save_steps == 0):
+        model_path = models_dir + model.name + '/'
+        model.save(model_path)
 
 

@@ -12,9 +12,14 @@ class CardClassifier(tf.keras.Model):
         super(CardClassifier, self).__init__()
 
         # Params
-        num_filters = 52
-        num_conv_lyrs = 16
+        self.model_name = 'CardClassifier'
+        #num_filters = 52
+        num_filters = 8
+        #num_conv_lyrs = 16
+        num_conv_lyrs = 3 
         num_class_lyrs = 2 
+        fc_units = 128
+        num_classes = 52
 
         # Multi-scale feature extractor layers
         self.fe_lyrs = []
@@ -26,9 +31,10 @@ class CardClassifier(tf.keras.Model):
         for i in range(num_class_lyrs):
             if(i == num_class_lyrs-1):
                 act = None
+                fc_units = num_classes
             else: 
                 act = 'relu'
-            self.class_lyrs.append(tf.keras.layers.Dense(units=num_filters, activation=act))
+            self.class_lyrs.append(tf.keras.layers.Dense(units=fc_units, activation=act))
 
     def call(self, x, reconstruct=True):
         ''' 
