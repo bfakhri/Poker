@@ -15,14 +15,18 @@ class CardDataset:
 
     def make_card(self, suit, rank):
         # Params
-        x_offs = 3
-        y_offs = 3
+        x_offs = 3 
+        y_offs = 3 
         # Get the base images
         img_card = self.img_blank_card.copy()
         img_suit = self.imgs_suit[suit].copy()
         # Place suit on blank card
         img_card[y_offs:y_offs+img_suit.shape[0], x_offs:x_offs+img_suit.shape[1], :] = img_suit
-        img_card[-y_offs:-y_offs-img_suit.shape[0], -x_offs:-x_offs-img_suit.shape[1], :] = img_suit
+        #img_card[img_card.shape[0]-img_suit.shape[0]:img_card.shape[0], img_card.shape[1]-img_suit.shape[1]:img_card.shape[0], :] = img_suit
+        print(img_card.shape[0]-img_suit.shape[0]-y_offs,img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1],img_card.shape[0])
+        print(img_card.shape[0]-img_suit.shape[0]-y_offs,img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1]-x_offs,img_card.shape[0]-x_offs)
+        print(img_card.shape)
+        img_card[img_card.shape[0]-img_suit.shape[0]-y_offs:img_card.shape[0]-y_offs, img_card.shape[1]-img_suit.shape[1]-x_offs:img_card.shape[1]-x_offs, :] = img_suit
 
 
         # Place rank on blank card
@@ -33,6 +37,7 @@ class CardDataset:
         cards = []
         for suit in self.suits:
             for rank in self.ranks:
+                print('Making: ', rank+suit)
                 card = self.make_card(suit, rank)
                 cards.append(card)
                 cv2.imshow('Card', card)
