@@ -93,6 +93,9 @@ class CardDataset:
             img_bg[y:y+card.shape[0], x:x+card.shape[1], :] = card
             x += card.shape[1] + x_spacing
 
+        # Reshape labels to flat
+        label = np.reshape(label, (-1))
+
         return img_bg, label
 
     def show_collections(self, N=100000):
