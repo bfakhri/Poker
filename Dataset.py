@@ -5,6 +5,7 @@ class CardDataset:
     def __init__(self):
         img_dir = './images/'
         self.suits = ['s','h','d','c']
+        self.suit_colors = {'s': (1,1,1),'h': (1,1,255),'d': (255,1,1),'c': (2,130,2)}
         self.ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
         self.fonts = [cv2.FONT_HERSHEY_SIMPLEX, 'FONT_HERSHEY_PLAIN', 'FONT_HERSHEY_DUPLEX', 'FONT_HERSHEY_COMPLEX', 'FONT_HERSHEY_TRIPLEX', 'FONT_HERSHEY_COMPLEX_SMALL', 'FONT_HERSHEY_SCRIPT_SIMPLEX', 'FONT_HERSHEY_SCRIPT_COMPLEX']
 
@@ -21,7 +22,8 @@ class CardDataset:
         rank_y_offs = 6
         font = self.fonts[0]
         font_scale = 0.65
-        color = (255, 0, 0) 
+        #color = (255, 0, 0) 
+        color = self.suit_colors[suit]
         thickness = 1
 
         # Get the base images
