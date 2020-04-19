@@ -24,7 +24,7 @@ class CardDataset:
         if(randomize):
             suit_x_offs = np.random.randint(1,4) 
             suit_y_offs = np.random.randint(1,4) 
-            rank_x_offs = np.random.randint(4,7) 
+            rank_x_offs = np.random.randint(4,9) 
             rank_y_offs = np.random.randint(5,8) 
             font = self.fonts[np.random.randint(0,len(self.fonts)-1)]
             font_scale = np.random.rand(1)*0.2 + 0.55 
@@ -39,6 +39,7 @@ class CardDataset:
             font = self.fonts[0]
             font_scale = 0.65
             thickness = 1
+        rank_x_offs *= len(rank)
         color = self.suit_colors[suit]
 
         # Place suit on blank card
@@ -62,7 +63,7 @@ class CardDataset:
                 card = self.make_card(suit, rank)
                 cards.append(card)
                 cv2.imshow('Card', card)
-                cv2.waitKey(100)
+                cv2.waitKey(-1)
 
     #kdef show_cards(cards):
     #k    for idx,card in enumerate(cards):
