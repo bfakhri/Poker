@@ -10,7 +10,7 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # Params
 batch_size = 64
-training_steps = 10000000
+training_steps = 1000000000
 save_steps = 1000
 models_dir = './saved_models/'
 
