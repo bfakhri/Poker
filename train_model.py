@@ -4,6 +4,7 @@ import Dataset
 import model
 import datetime
 import glob
+from tensorflow.python.keras import backend as K
 
 # Hack to get it to work with RTX cards
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -16,6 +17,8 @@ training_steps = 1000000000
 save_steps = 1000
 models_dir = './saved_models/'
 load_latest_model = True
+pos_weight = 52.0/2.5
+neg_weight = 1.0/pos_weight
 
 def find_latest_model(model_dir):
     print('Searching for Saved Models in: ', model_dir)
@@ -42,6 +45,7 @@ if(load_latest_model):
     model_path, start_step = find_latest_model(models_dir)
     model = model = tf.keras.models.load_model(model_path)
 else:
+    start_step = 0
     model = model.CardClassifier()
     model._set_inputs(tf.keras.Input(shape=(None, None, 3)))
 optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
@@ -78,22 +82,30 @@ for step in range(start_step, training_steps):
 
     with tf.GradientTape() as tape:
         y_hat = model(x)
-        loss = tf.reduce_mean(tf.keras.losses.categorical_crossentropy(y, y_hat))
+        #loss = tf.keras.losses.categorical_crossentropy(y, y_hat)
+        loss = K.binary_crossentropy(y, y_hat)
 
-        grads = tape.gradient(loss, model.weights)
+        # Weight the loss
+        pos_weights = y*pos_weight
+        neg_weights = (1.0-y)*neg_weight
+        loss_weights = pos_weights + neg_weights
+
+        loss_weighted = tf.reduce_mean(loss*loss_weights)
+
+        grads = tape.gradient(loss_weighted, model.weights)
         optimizer.apply_gradients(zip(grads, model.weights))
 
         acc = accuracy(y, y_hat)
         precision, recall = precision_recall(y, y_hat)
         tf.summary.image('Inputs', x, step=step)
-        tf.summary.scalar('ClassLoss', loss, step=step)
+        tf.summary.scalar('ClassLoss', loss_weighted, step=step)
         tf.summary.scalar('Acc', acc, step=step)
         tf.summary.scalar('Precision', precision, step=step)
         tf.summary.scalar('Recall', recall, step=step)
         tf.summary.histogram('Labels', y, step=step)
         tf.summary.histogram('Predictions', y_hat, step=step)
 
-        print('Step: ', step, acc.numpy()*100, precision.numpy(), recall.numpy(), loss.numpy())
+        print('Step: ', step, acc.numpy()*100, precision.numpy(), recall.numpy(), loss_weighted.numpy())
 
     # Save model
     if(step % save_steps == 0):
