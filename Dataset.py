@@ -35,7 +35,6 @@ class CardDataset:
             rank_x_offs = np.random.randint(4,9) 
             rank_y_offs = np.random.randint(5,8) 
             font = self.fonts[np.random.randint(0,len(self.fonts))]
-            print(font)
             font_scale = np.random.rand(1)*0.2 + 0.55 
             thickness = np.random.rand(1)*0.125 + 0.9
             suit_scale = np.random.rand(2)*0.5 + 0.9
