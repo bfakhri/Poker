@@ -14,9 +14,11 @@ class CardClassifier(tf.keras.Model):
         # Params
         self.model_name = 'CardClassifier'
         #num_filters = 52
-        num_filters = 8
+        #num_filters = 8
+        num_filters = 16
         #num_conv_lyrs = 16
-        num_conv_lyrs = 3 
+        #num_conv_lyrs = 3 
+        num_conv_lyrs = 8
         num_class_lyrs = 2 
         fc_units = 128
         num_classes = 52
