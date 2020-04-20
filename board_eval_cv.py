@@ -94,8 +94,8 @@ class ScreenScraper:
                 cv2.moveWindow('board', 600, 400)
                 self.first_windows = False
             # Get Predictions from Models
-            pred_hand = model(sct_img_hand)
-            pred_board = model(sct_img_board)
+            pred_hand = self.model(sct_img_hand[np.newaxis,...,0:3]/255.0)
+            pred_board = self.model(sct_img_board[np.newaxis,...,0:3]/255.0)
             print(pred_hand, pred_board)
             cv2.waitKey(1)
 

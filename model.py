@@ -38,7 +38,7 @@ class CardClassifier(tf.keras.Model):
                 act = 'relu'
             self.class_lyrs.append(tf.keras.layers.Dense(units=fc_units, activation=act))
 
-    def call(self, x, reconstruct=True):
+    def call(self, x):
         ''' 
         Trains as an autoencoder but provides features during inference
         '''

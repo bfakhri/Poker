@@ -19,6 +19,7 @@ ds = Dataset.CardDataset()
 
 # Instantiate the model
 model = model.CardClassifier()
+model._set_inputs(tf.keras.Input(shape=(None, None, 3)))
 optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
 
 # Setup Tensorboard
@@ -39,9 +40,6 @@ for step in range(training_steps):
     x = tf.cast(x, tf.float32)/255.0
     y = tf.cast(y, tf.float32)
 
-    if(step == 0):
-        model._set_inputs(x)
-
     with tf.GradientTape() as tape:
         y_hat = model(x)
         loss = tf.reduce_mean(tf.keras.losses.categorical_crossentropy(y, y_hat))
@@ -56,7 +54,7 @@ for step in range(training_steps):
         tf.summary.histogram('Labels', y, step=step)
         tf.summary.histogram('Predictions', y_hat, step=step)
 
-        print(step, acc.numpy()*100, loss.numpy())
+        print('Step: ', step, acc.numpy()*100, loss.numpy())
 
     # Save model
     if(step % save_steps == 0):
