@@ -10,6 +10,7 @@ class CardDataset:
         self.suits = ['s','h','d','c']
         self.suit_colors = {'s': (1,1,1),'h': (1,1,255),'d': (255,1,1),'c': (2,130,2)}
         self.ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+        self.ranks_trey = ['A','2','3','4','5','6','7','8','9','T','J','Q','K']
         #self.fonts = [cv2.FONT_HERSHEY_SIMPLEX, cv2.FONT_HERSHEY_PLAIN, cv2.FONT_HERSHEY_DUPLEX, cv2.FONT_HERSHEY_COMPLEX, cv2.FONT_HERSHEY_TRIPLEX, cv2.FONT_HERSHEY_COMPLEX_SMALL, cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, cv2.FONT_HERSHEY_SCRIPT_COMPLEX]
         self.fonts = [cv2.FONT_HERSHEY_SIMPLEX, cv2.FONT_HERSHEY_DUPLEX, cv2.FONT_HERSHEY_COMPLEX, cv2.FONT_HERSHEY_TRIPLEX]
 
@@ -22,6 +23,21 @@ class CardDataset:
         self.img_backgrounds = []
         for bg in self.backgrounds:
             self.img_backgrounds.append(cv2.imread(img_dir+bg))
+
+    def flatidx_to_card(self, flat_idxs):
+        ''' 
+        Converts a flat idx (like what is given by the model) into a 'treys' card
+        Inputs: (idx) -> [cards]
+        '''
+        suit_idxs, rank_idxs = np.unravel_index(flat_idxs, (len(self.suits), len(self.ranks)))
+        cards = []
+        for i in range(len(flat_idxs)):
+            rank_str = self.ranks_trey[rank_idxs[i]]
+            suit_str = self.suits[suit_idxs[i]]
+            cards.append(Card.new(rank_str+suit_str))
+
+        return cards
+
 
     def make_card(self, suit, rank, randomize=True):
         # Get the base images

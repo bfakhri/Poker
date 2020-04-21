@@ -12,21 +12,17 @@ import pynput
 import time
 import threading
 import tensorflow as tf
+import utils
+from treys import Card
 
 from pynput import mouse
 from pynput import keyboard
 
-
 class ScreenScraper:
     def __init__(self):
-        # Setup input listeners:
-        self.key_listener = keyboard.Listener(on_press=self.key_on_press)
-        self.key_listener.start()
-        self.listener = mouse.Listener(on_click=self.on_click, on_move=self.on_move)
-        self.listener.start()
-
         # Card detection model
-        model_path = './saved_models/card_classifier/'
+        model_dir = './saved_models/'
+        model_path, step = utils.find_latest_model(model_dir)
         self.model = tf.keras.models.load_model(model_path)
 
         # Switches
@@ -47,6 +43,11 @@ class ScreenScraper:
         # Start watcher thread
         watch = threading.Thread(target=self.window_watcher)
         watch.start()
+        # Setup input listeners:
+        self.key_listener = keyboard.Listener(on_press=self.key_on_press)
+        self.key_listener.start()
+        self.listener = mouse.Listener(on_click=self.on_click, on_move=self.on_move)
+        self.listener.start()
 
         # Fix windows
         self.init_windows()
@@ -56,6 +57,7 @@ class ScreenScraper:
         # Set switches
         self.move_hand = True
         self.move_board = False 
+
         # Gets the position of the user's cards
         print('Move mouse to top left-hand corner of hand')
         print('Use the arrow keys to adjust window')
@@ -63,6 +65,7 @@ class ScreenScraper:
         while(self.move_hand):
             print('Waiting on hand...')
             time.sleep(1)
+
         # Gets the position of the board
         self.move_hand = False
         self.move_board = True 
@@ -94,9 +97,11 @@ class ScreenScraper:
                 cv2.moveWindow('board', 600, 400)
                 self.first_windows = False
             # Get Predictions from Models
-            pred_hand = self.model(sct_img_hand[np.newaxis,...,0:3]/255.0)
-            pred_board = self.model(sct_img_board[np.newaxis,...,0:3]/255.0)
-            print(pred_hand, pred_board)
+            pred_hand = tf.squeeze(self.model(sct_img_hand[np.newaxis,...,0:3]/255.0))
+            pred_board = tf.squeeze(self.model(sct_img_board[np.newaxis,...,0:3]/255.0))
+            pred_hand_cards = utils.cards_from_preds(pred_hand, 2)
+            pred_board_cards = utils.cards_from_preds(pred_board, 3)
+            print('Hand: ', Card.print_pretty_cards(pred_hand_cards), '\tBoard: ', Card.print_pretty_cards(pred_board_cards))
             cv2.waitKey(1)
 
     def on_move(self, x, y):
