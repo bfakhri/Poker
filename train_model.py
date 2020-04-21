@@ -17,7 +17,7 @@ training_steps = 1000000000
 save_steps = 1000
 models_dir = './saved_models/'
 load_latest_model = True
-pos_weight = 52.0/2.5
+pos_weight = 4.0
 neg_weight = 1.0/pos_weight
 
 def find_latest_model(model_dir):
@@ -64,12 +64,23 @@ def accuracy(y, y_hat, thresh=0.5):
     acc = tf.reduce_mean(tf.cast(tf.equal(y_bool, y_hat_bool), tf.float32))
     return acc
 
+def accuracy_topk(y, y_hat):
+    ''' Assuming you know the number of cards present, how accurate? '''
+    num_cards = tf.cast(tf.reduce_sum(y, axis=-1), tf.int32)
+    sorted_idxs = tf.argsort(y_hat, axis=-1, direction='DESCENDING')
+    # Get the top num_cards predicitons
+    summer = 0
+    for i in range(y.shape[0]):
+        top_idxs = sorted_idxs[i,0:num_cards[i]]
+        y_top = tf.gather(y[i,:], top_idxs)
+        summer += tf.reduce_sum(y_top)
+    acc = tf.cast(summer, tf.float32)/tf.cast(tf.reduce_sum(num_cards), tf.float32)
+    return acc
+
 def precision_recall(y, y_hat, thresh=0.5):
     y_hat_bool = y_hat > thresh
     y_bool = y > thresh
     TP = tf.reduce_sum(tf.cast(tf.logical_and(y_bool, y_hat_bool), tf.float32))
-    #FP = tf.reduce_sum(tf.cast(tf.logical_and(y_bool, tf.logical_not(y_hat_bool)), tf.float32))
-    #precision = TP/(TP+FP)
     precision = TP/tf.reduce_sum(y_hat)
     recall = TP/tf.reduce_sum(tf.cast(y_bool, tf.float32))
     return precision, recall
@@ -96,10 +107,12 @@ for step in range(start_step, training_steps):
         optimizer.apply_gradients(zip(grads, model.weights))
 
         acc = accuracy(y, y_hat)
+        acc_topk = accuracy_topk(y, y_hat)
         precision, recall = precision_recall(y, y_hat)
         tf.summary.image('Inputs', x, step=step)
         tf.summary.scalar('ClassLoss', loss_weighted, step=step)
         tf.summary.scalar('Acc', acc, step=step)
+        tf.summary.scalar('AccTopK', acc_topk, step=step)
         tf.summary.scalar('Precision', precision, step=step)
         tf.summary.scalar('Recall', recall, step=step)
         tf.summary.histogram('Labels', y, step=step)
