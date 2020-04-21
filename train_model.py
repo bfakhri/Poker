@@ -17,7 +17,7 @@ training_steps = 1000000000
 save_steps = 1000
 models_dir = './saved_models/'
 load_latest_model = True
-pos_weight = 4.0
+pos_weight = 10.0
 neg_weight = 1.0/pos_weight
 
 def find_latest_model(model_dir):
@@ -41,9 +41,9 @@ def find_latest_model(model_dir):
     return max_step_model, max_step
 
 # Instantiate the model
-if(load_latest_model):
-    model_path, start_step = find_latest_model(models_dir)
-    model = model = tf.keras.models.load_model(model_path)
+latest_model_path, start_step = find_latest_model(models_dir)
+if(load_latest_model and latest_model_path is not None):
+    model = model = tf.keras.models.load_model(latest_model_path)
 else:
     start_step = 0
     model = model.CardClassifier()
