@@ -68,8 +68,9 @@ def precision_recall(y, y_hat, thresh=0.5):
     y_hat_bool = y_hat > thresh
     y_bool = y > thresh
     TP = tf.reduce_sum(tf.cast(tf.logical_and(y_bool, y_hat_bool), tf.float32))
-    FP = tf.reduce_sum(tf.cast(tf.logical_and(y_bool, tf.logical_not(y_hat_bool)), tf.float32))
-    precision = TP/(TP+FP)
+    #FP = tf.reduce_sum(tf.cast(tf.logical_and(y_bool, tf.logical_not(y_hat_bool)), tf.float32))
+    #precision = TP/(TP+FP)
+    precision = TP/tf.reduce_sum(y_hat)
     recall = TP/tf.reduce_sum(tf.cast(y_bool, tf.float32))
     return precision, recall
 
@@ -82,7 +83,6 @@ for step in range(start_step, training_steps):
 
     with tf.GradientTape() as tape:
         y_hat = model(x)
-        #loss = tf.keras.losses.categorical_crossentropy(y, y_hat)
         loss = K.binary_crossentropy(y, y_hat)
 
         # Weight the loss
