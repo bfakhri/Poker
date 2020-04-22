@@ -14,6 +14,7 @@ import threading
 import tensorflow as tf
 import utils
 from treys import Card
+from treys import Evaluator
 
 from pynput import mouse
 from pynput import keyboard
@@ -28,6 +29,10 @@ class ScreenScraper:
         # Switches
         self.move_hand = True
         self.move_board = False 
+
+        # Card Game Params
+        self.hand_evaluator = Evaluator()
+        self.num_distinct_hands = 7462
 
         # Window Params
         self.min_width = 10
@@ -101,7 +106,11 @@ class ScreenScraper:
             pred_board = tf.squeeze(self.model(sct_img_board[np.newaxis,...,0:3]/255.0))
             pred_hand_cards = utils.cards_from_preds(pred_hand, 2)
             pred_board_cards = utils.cards_from_preds(pred_board, 3)
-            print('Hand: ', Card.print_pretty_cards(pred_hand_cards), '\tBoard: ', Card.print_pretty_cards(pred_board_cards))
+            hand_str = Card.print_pretty_cards(pred_hand_cards)
+            board_str = Card.print_pretty_cards(pred_board_cards)
+            hand_rank = self.hand_evaluator.evaluate(pred_board_cards, pred_hand_cards)
+            strength_str = 'Strength: {0}, Win: {1:3.2f}%'.format(hand_rank, 100.0*hand_rank/self.num_distinct_hands)
+            print('Hand: ',  hand_str, '  Board: ', board_str, strength_str)
             cv2.waitKey(1)
 
     def on_move(self, x, y):
