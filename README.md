@@ -1,5 +1,8 @@
 # Automatic Poker Hand Evaluator
-Evaluates Poker Hands with the Treys Evaluator: [Github](https://github.com/ihendley/treys).
+
+System to provide useful information during virtual poker games automatically. 
+
+A card classification model trained on an automatically generated synthetic dataset detects the cards present in an image. When setup, it detects cards in a player's hand and community cards (for Texas Hold'em poker). The player's hand and the community cards are evaluated for strength using the treys poker hand evaluator: [Github](https://github.com/ihendley/treys).
 
 ## Install
 ```
