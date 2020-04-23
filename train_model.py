@@ -64,14 +64,18 @@ for step in range(start_step, training_steps):
         acc = utils.accuracy(y, y_hat)
         acc_topk = utils.accuracy_topk(y, y_hat)
         precision, recall = utils.precision_recall(y, y_hat)
+        auc_metric = tf.keras.metrics.AUC()
+        auc_metric.update_state(y, y_hat)
         tf.summary.image('Inputs', x, step=step)
         tf.summary.scalar('ClassLoss', loss_weighted, step=step)
         tf.summary.scalar('Acc', acc, step=step)
+        tf.summary.scalar('AuC', auc_metric.result(), step=step)
         tf.summary.scalar('AccTopK', acc_topk, step=step)
         tf.summary.scalar('Precision', precision, step=step)
         tf.summary.scalar('Recall', recall, step=step)
         tf.summary.histogram('Labels', y, step=step)
         tf.summary.histogram('Predictions', y_hat, step=step)
+        auc_metric.reset_states()
 
         print('Step: ', step, acc.numpy()*100, precision.numpy(), recall.numpy(), loss_weighted.numpy())
 
