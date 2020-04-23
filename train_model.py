@@ -42,7 +42,7 @@ summary_writer.set_as_default()
 
 for step in range(start_step, training_steps):
     # Get batch of samples
-    x, y = ds.batch_collection(batch_size)
+    x, y = ds.batch_collection(batch_size, font=0)
     # Convert to float32
     x = tf.cast(x, tf.float32)/255.0
     y = tf.cast(y, tf.float32)

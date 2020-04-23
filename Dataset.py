@@ -51,6 +51,8 @@ class CardDataset:
             rank_y_offs = np.random.randint(5,8) 
             if(font is None):
                 font = self.fonts[np.random.randint(0,len(self.fonts))]
+            else: 
+                font = self.fonts[font]
             font_scale = np.random.rand(1)*0.2 + 0.55 
             suit_scale = np.random.rand(2)*0.5 + 0.75
             img_suit = cv2.resize(img_suit, (0,0), fx=suit_scale[0], fy=suit_scale[1])
@@ -61,6 +63,8 @@ class CardDataset:
             rank_y_offs = 6
             if(font is None):
                 font = self.fonts[0]
+            else: 
+                font = self.fonts[font]
             font_scale = [0.65]
         rank_x_offs *= len(rank)
         color = self.suit_colors[suit]
@@ -108,7 +112,7 @@ class CardDataset:
             cv2.imshow('Card', card)
             cv2.waitKey(-1)
 
-    def make_collection(self, background=None, min_cards=0, max_cards=5):
+    def make_collection(self, background=None, min_cards=0, max_cards=5, font=None):
         ''' Makes a collection of cards and the labels '''
         # Spacing between cards
         x_spacing = np.random.randint(1,20) 
@@ -129,7 +133,7 @@ class CardDataset:
                 card_id = np.random.randint(0, label.size-1)
             label.flat[card_id] = 1
             suit_idx, rank_idx = np.unravel_index(card_id, (4,13))
-            card = self.make_card(self.suits[suit_idx], self.ranks[rank_idx], randomize=True)
+            card = self.make_card(self.suits[suit_idx], self.ranks[rank_idx], randomize=True, font=font)
             img_bg[y:y+card.shape[0], x:x+card.shape[1], :] = card
             x += card.shape[1] + x_spacing
 
@@ -146,13 +150,13 @@ class CardDataset:
             cv2.waitKey(-1)
             
 
-    def batch_collection(self, bs):
+    def batch_collection(self, bs, font=None):
         ''' Generates a batch of card collections and labels '''
         collections = []
         labels = []
         bg = self.img_backgrounds[np.random.randint(0,len(self.img_backgrounds))].copy()
         for i in range(bs):
-            coll, lab = self.make_collection(background=bg)
+            coll, lab = self.make_collection(background=bg, font=font)
             collections.append(coll)
             labels.append(lab)
 
