@@ -112,7 +112,7 @@ class CardDataset:
             cv2.imshow('Card', card)
             cv2.waitKey(-1)
 
-    def make_collection(self, background=None, min_cards=0, max_cards=5, font=None):
+    def make_collection(self, background=None, min_cards=0, max_cards=5, font=None, cutoff=False):
         ''' Makes a collection of cards and the labels '''
         # Spacing between cards
         x_spacing = np.random.randint(1,20) 
@@ -137,6 +137,10 @@ class CardDataset:
             img_bg[y:y+card.shape[0], x:x+card.shape[1], :] = card
             x += card.shape[1] + x_spacing
 
+        if(cutoff):
+            #img_bg = img_bg[0:int(card.shape[0]), x:x+card.shape[1], :] = card
+            img_bg = img_bg[0:y+int(0.7*card.shape[0]), :, :] 
+
         # Reshape labels to flat
         label = np.reshape(label, (-1))
 
@@ -156,7 +160,7 @@ class CardDataset:
         labels = []
         bg = self.img_backgrounds[np.random.randint(0,len(self.img_backgrounds))].copy()
         for i in range(bs):
-            coll, lab = self.make_collection(background=bg, font=font)
+            coll, lab = self.make_collection(background=bg, font=font, cutoff=(i%2==0))
             collections.append(coll)
             labels.append(lab)
 
