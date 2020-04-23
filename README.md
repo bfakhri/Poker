@@ -1,4 +1,4 @@
-# Poker
+# Automatic Poker Hand Evaluator
 Evaluates Poker Hands with the Treys Evaluator: [Github](https://github.com/ihendley/treys).
 
 ## Install
@@ -10,7 +10,16 @@ source virtualenv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage 
+## Training the Model
+```
+python train_model.py
+
+tensorboard --logdir=./logs/
+```
+
+To monitor training, point your browser to 127.0.0.1:6006. A decent model takes about a day or more to train on an Nvidia GTX 1080 ti. 
+
+## Playing with the Trained Model
 
 To use, run ``` python3 board_eval_cv.py ```, two windows will appear and your mouse controls the smaller one. 
 
