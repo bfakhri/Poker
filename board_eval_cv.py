@@ -1,7 +1,8 @@
-################################################################
-# Captures a portion of the screen                             #
-# Based on the mss library: https://python-mss.readthedocs.io/ #
-################################################################
+###############################################################################
+# Sets up windows to capture screenshot of player hand and community board    # 
+# The hand/board images are sent to a model to infer the cards in the image   #
+# The inferred cards are evaluated for strength and displayed for the user    #
+###############################################################################
 
 import numpy as np
 import cv2
@@ -48,6 +49,7 @@ class ScreenScraper:
         # Start watcher thread
         watch = threading.Thread(target=self.window_watcher)
         watch.start()
+
         # Setup input listeners:
         self.key_listener = keyboard.Listener(on_press=self.key_on_press)
         self.key_listener.start()
@@ -93,14 +95,20 @@ class ScreenScraper:
             monitor_hand = {"top": self.hand_window[1], "left": self.hand_window[0], "width": self.hand_window[2], "height": self.hand_window[3]}
             monitor_board = {"top": self.board_window[1], "left": self.board_window[0], "width": self.board_window[2], "height": self.board_window[3]}
             # Grab the data
-            sct_img_hand = np.asarray(sct.grab(monitor_hand))
-            sct_img_board = np.asarray(sct.grab(monitor_board))
+            try:
+                sct_img_hand = np.asarray(sct.grab(monitor_hand))
+                sct_img_board = np.asarray(sct.grab(monitor_board))
+            except mss.exception.ScreenShotError:
+                print('Screentshot Failed')
+                sct_img_hand = np.zeros((200,400, 3))
+                sct_img_board = np.zeros((200,400, 3)) 
             cv2.imshow('hand', sct_img_hand)
             cv2.imshow('board', sct_img_board)
             if(self.first_windows):
                 cv2.moveWindow('hand', 600, 100)
                 cv2.moveWindow('board', 600, 400)
                 self.first_windows = False
+
             # Get Predictions from Models
             pred_hand = tf.squeeze(self.model(sct_img_hand[np.newaxis,...,0:3]/255.0))
             pred_board = tf.squeeze(self.model(sct_img_board[np.newaxis,...,0:3]/255.0))
@@ -122,15 +130,9 @@ class ScreenScraper:
 
     def on_click(self, x, y, button, pressed):
         pass
-        #print('{0} at {1}'.format('Pressed' if pressed else 'Released',(x, y)))
-        #if not pressed:
-        #    print('Done moving:')
-        #    self.move_hand = False
-        #    self.move_board = False
-        #    # Stop the listener
-        #    #return False
 
     def key_on_press(self, key):
+        ''' Edit window size based on arrow keys '''
         delta = 4
         if(key == keyboard.Key.enter):
             print('Done moving:')
