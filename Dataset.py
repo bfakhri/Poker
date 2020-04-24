@@ -137,9 +137,12 @@ class CardDataset:
             img_bg[y:y+card.shape[0], x:x+card.shape[1], :] = card
             x += card.shape[1] + x_spacing
 
-        if(cutoff):
-            #img_bg = img_bg[0:int(card.shape[0]), x:x+card.shape[1], :] = card
-            img_bg = img_bg[0:y+int(0.7*card.shape[0]), :, :] 
+        if(cutoff and num_cards > 0): 
+            img_bg[y+int(0.7*card.shape[0]):, :, :]  = np.random.randint(0,256)
+
+        # Add random noise to image
+        #img_bg += (np.random.randn(img_bg.size)*12).astype(np.uint8)
+        img_bg = (np.clip(img_bg.astype(np.float64) + np.reshape(np.random.randn(img_bg.size)*12, img_bg.shape), 0, 255)).astype(np.uint8)
 
         # Reshape labels to flat
         label = np.reshape(label, (-1))
